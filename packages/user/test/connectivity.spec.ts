@@ -1,32 +1,26 @@
-const { Pool } = require("pg");
+import { Identifier } from "@4irbnb/common";
+import { Email } from "../src/domains/fields";
+import { Repository } from "../src/repos";
+import { IRepository } from "../src/repos/types";
 
-describe("it", () => {
-  it("y", async () => {
-    const pool = new Pool({
-      host: "database-1.cmkyxohdorvf.us-east-1.rds.amazonaws.com",
-      user: "postgres",
-      password: "testadmin",
-    });
+let repo: IRepository;
 
-    // the pool with emit an error on behalf of any idle clients
-    // it contains if a backend error or network partition happens
-    pool.on("error", (err, client) => {
-      console.error("Unexpected error on idle client", err); // your callback here
-      process.exit(-1);
-    });
+beforeAll(async () => {
+  repo = await Repository.initialize();
+  await repo.openConnection();
+});
 
-    // promise - checkout a client
-    pool.connect().then((client) => {
-      return client
-        .query("SELECT * FROM users WHERE id = $1", [1]) // your query string here
-        .then((res) => {
-          client.release();
-          console.log(res.rows[0]); // your callback here
-        })
-        .catch((e) => {
-          client.release();
-          console.log(err.stack); // your callback here
-        });
-    });
+afterAll(async () => {
+  await repo.closeConnection();
+});
+
+describe("Connectivity", () => {
+  it("Finds by ID", async () => {
+    const user = await repo.findById(new Identifier("1"));
+    expect(user).not.toBeNull();
+  });
+  it("Finds by Email", async () => {
+    const user = await repo.findByEmail(Email.create("kenichikona@gmail.com"));
+    expect(user).not.toBeNull();
   });
 });

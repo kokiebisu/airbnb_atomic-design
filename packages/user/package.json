@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@4irbnb/common": "file:../common",
+    "@4irbnb/manager": "file:../manager",
+    "@aws-sdk/client-rds": "^3.32.0",
     "pg": "^8.7.1",
     "uuid": "^8.3.2"
   },

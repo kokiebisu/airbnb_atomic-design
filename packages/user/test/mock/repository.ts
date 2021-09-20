@@ -1,14 +1,19 @@
 import { IRepository } from "../../src/repos/types";
-import { IDataTransferObject } from "../../src/dto";
 import { Identifier } from "@4irbnb/common";
 import { Mapper } from "../../src/mapper";
 import { Entity } from "../../src/domains";
+import { IRawData } from "../../src/mapper/types";
+import { Email } from "../../src/domains/fields";
 
 export class Repository implements IRepository {
-  store: { [key: string]: IDataTransferObject };
+  store: { [key: string]: IRawData };
   public constructor() {
     this.store = {};
   }
+
+  public async openConnection() {}
+
+  public async closeConnection() {}
 
   public async findById(id: Identifier) {
     const target = Object.values(this.store).find(
@@ -17,24 +22,24 @@ export class Repository implements IRepository {
     if (!target) {
       return null;
     }
-    return Mapper.convertToEntity(target);
+    return Mapper.convertToEntityFromRaw(target);
   }
 
-  public async findByEmail(email: string) {
+  public async findByEmail(email: Email) {
     const target = Object.values(this.store).find(
-      (data) => data.email === email
+      (data) => data.email === email.getValue()
     );
     if (!target) {
       return null;
     }
 
-    return Mapper.convertToEntity(target);
+    return Mapper.convertToEntityFromRaw(target);
   }
 
   public async save(entity: Entity) {
     const targetId = entity.id.toString();
-    const dto = Mapper.convertToDTO(entity);
-    this.store[targetId] = dto;
+    const rawData = Mapper.convertToRaw(entity);
+    this.store[targetId] = rawData;
   }
 
   public async delete(entity: Entity) {

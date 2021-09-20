@@ -1,9 +1,10 @@
+import { Email } from "../src/domains/fields";
 import { RegisterCommand, UpdateCommand } from "../src/commands";
 import { Service } from "../src/services";
 import { RegisterUseCase, UpdateUseCase } from "../src/usecases";
 import { Repository, Factory, user } from "./mock";
 
-describe.only("Update", () => {
+describe.skip("Update", () => {
   const factory = new Factory();
   const repository = new Repository();
   const data = { ...user };
@@ -23,7 +24,7 @@ describe.only("Update", () => {
   });
   it("is not successful with invalid email", async () => {
     let exceptionThrown = false;
-    let foundUser = await repository.findByEmail(data.email);
+    let foundUser = await repository.findByEmail(Email.create(data.email));
     expect(foundUser).not.toBeNull();
 
     const service = new Service(repository);
@@ -43,7 +44,7 @@ describe.only("Update", () => {
   });
   it("is successful", async () => {
     let exceptionThrown = false;
-    let foundUser = await repository.findByEmail(data.email);
+    let foundUser = await repository.findByEmail(Email.create(data.email));
     expect(foundUser).not.toBeNull();
 
     const service = new Service(repository);
